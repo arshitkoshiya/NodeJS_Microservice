@@ -1,16 +1,54 @@
 <!DOCTYPE html>
-<html>
-  <body style="font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px;">
-    <div style="background: white; padding: 20px; border-radius: 8px;">
-      <h2 style="color: #4CAF50;">Order Confirmation</h2>
-      <p>Hello {{name}},</p>
-      <p>Thanks for your order! Here are the details:</p>
-      <ul>
-        <li><strong>Product:</strong> {{product}}</li>
-        <li><strong>Quantity:</strong> {{quantity}}</li>
-        <li><strong>Amount:</strong> ${{amount}}</li>
-      </ul>
-      <p>We appreciate your business!</p>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Order Confirmation</title>
+  </head>
+  <body style="margin: 0; padding: 0; background-color: #f3f6fb; font-family: 'Helvetica Neue', sans-serif; color: #333;">
+    <div style="max-width: 640px; margin: 30px auto; border-radius: 14px; background: #ffffff; box-shadow: 0 12px 24px rgba(0, 0, 0, 0.05); overflow: hidden;">
+
+      <!-- Header -->
+      <div style="background: linear-gradient(90deg, #00c6ff, #0072ff); color: white; padding: 25px 30px;">
+        <h1 style="margin: 0; font-size: 26px;">🎉 Order Successfully Placed!</h1>
+        <p style="margin: 4px 0 0; font-size: 16px;">Hi {{name}}, here's your order summary.</p>
+      </div>
+
+      <!-- Body -->
+      <div style="padding: 30px;">
+        <table style="width: 100%; margin-bottom: 20px; border-collapse: collapse;">
+          <tr>
+            <td style="padding: 12px 0; font-weight: 600; font-size: 15px;">📦 Product</td>
+            <td style="padding: 12px 0; font-size: 15px;">{{product}}</td>
+          </tr>
+          <tr style="background-color: #f9fafc;">
+            <td style="padding: 12px 0; font-weight: 600; font-size: 15px;">🔢 Quantity</td>
+            <td style="padding: 12px 0; font-size: 15px;">{{quantity}}</td>
+          </tr>
+          <tr>
+            <td style="padding: 12px 0; font-weight: 600; font-size: 15px;">💰 Total Amount</td>
+            <td style="padding: 12px 0; font-size: 15px;">₹{{amount}}</td>
+          </tr>
+        </table>
+
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="#" style="display: inline-block; background: #0072ff; color: #fff; text-decoration: none; padding: 12px 28px; border-radius: 30px; font-size: 15px; font-weight: 600;">
+            Track My Order
+          </a>
+        </div>
+
+        <p style="font-size: 14px; color: #666; text-align: center; line-height: 1.6;">
+          You’ll get another email once your order is on its way.
+          <br />
+          Thanks for shopping with us!
+        </p>
+      </div>
+
+      <!-- Footer -->
+      <div style="background-color: #f0f3f7; padding: 20px; text-align: center; font-size: 12px; color: #999;">
+        &copy; {{year}} YourBrand. All rights reserved.
+        <br />
+        Need help? <a href="#" style="color: #0072ff; text-decoration: none;">Contact Support</a>
+      </div>
     </div>
   </body>
 </html>
