@@ -8,7 +8,7 @@ const mongoose = require('mongoose');
 const { buildSubgraphSchema } = require('@apollo/subgraph');
 const typeDefs = require('./graphql/schema');
 const resolvers = require('./graphql/resolvers');
-const { connectRabbitMQ } = require('./rabbitmq/connection');
+const  connectRabbitMQ  = require('./rabbitmq/connection');
 
 async function startServer() {
   const app = express();

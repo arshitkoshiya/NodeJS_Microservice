@@ -1,7 +1,6 @@
-// user-service/models/User.js
 const mongoose = require('mongoose');
 
-const UserSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -11,7 +10,7 @@ const UserSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
-  orders: [String] // ✅ Add this line
+  orders: [String] // ✅ If needed
 });
 
-module.exports = mongoose.model('User', UserSchema);
+module.exports = mongoose.model('User', userSchema);

@@ -1,19 +1,31 @@
+// user-service/rabbitmq/connection.js
 const amqp = require('amqplib');
 
-let channel;
-
 async function connectRabbitMQ() {
-  const connection = await amqp.connect(process.env.RABBITMQ_URL);
-  channel = await connection.createChannel();
-  await channel.assertQueue('user_created');
-  console.log('User Service: RabbitMQ Connected');
+  const connection = await amqp.connect(process.env.RABBITMQ_URL || 'amqp://localhost');
+  const channel = await connection.createChannel();
+  await channel.assertQueue('get_user_data');
+  console.log('✅ User Service: RabbitMQ connected');
+
+  channel.consume('get_user_data', async (msg) => {
+    const { userId, correlationId, replyTo } = JSON.parse(msg.content.toString());
+
+    const User = require('../models/User');
+    const user = await User.findById(userId);
+
+    const response = {
+      name: user?.name,
+      email: user?.email,
+    };
+
+    console.log('📤 Responding with user data:', response);
+
+    channel.sendToQueue(replyTo, Buffer.from(JSON.stringify(response)), {
+      correlationId,
+    });
+
+    channel.ack(msg);
+  });
 }
 
-function getChannel() {
-  if (!channel) {
-    throw new Error('RabbitMQ channel is not initialized');
-  }
-  return channel;
-}
-
-module.exports = { connectRabbitMQ, getChannel };
+module.exports = connectRabbitMQ;
