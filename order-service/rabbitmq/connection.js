@@ -1,4 +1,3 @@
-
 // ✅ order-service/rabbitmq.js
 const amqp = require("amqplib");
 const { v4: uuidv4 } = require("uuid");
@@ -27,10 +26,13 @@ async function getUserData(userId) {
   return new Promise((resolve, reject) => {
     tempChannel.consume(
       replyQueue.queue,
-      (msg) => {
+      async (msg) => {
+        if (!msg) return;
         if (msg.properties.correlationId === correlationId) {
           const user = JSON.parse(msg.content.toString());
           resolve(user);
+          await tempChannel.deleteQueue(replyQueue.queue);
+          await tempChannel.close();
         }
       },
       { noAck: true }

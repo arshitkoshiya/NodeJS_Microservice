@@ -17,7 +17,9 @@
     "apollo-server-express": "^3.13.0",
     "dotenv": "^16.5.0",
     "express": "^4.21.2",
-    "graphql": "^16.11.0"
+    "express-rate-limit": "^7.5.0",
+    "graphql": "^16.11.0",
+    "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"

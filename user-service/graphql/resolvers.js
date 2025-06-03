@@ -17,19 +17,32 @@
 //   },
 // };
 
-
-const User = require("../models/User");
-const { getChannel } = require("../rabbitmq/connection");
+const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 
 module.exports = {
   Query: {
     users: async () => await User.find(),
   },
+
   Mutation: {
     createUser: async (_, { name, email }) => {
-      const user = new User({ name, email }); // Mongoose or in-memory
+      const user = new User({ name, email });
       await user.save();
       return user;
     },
-  },
+
+    login: async (_, { email }) => {
+      const user = await User.findOne({ email });
+      if (!user) throw new Error('User not found');
+
+      const token = jwt.sign(
+        { userId: user.id, email: user.email },
+        process.env.JWT_SECRET,
+        { expiresIn: '1h' }
+      );
+
+      return { token, user };
+    }
+  }
 };

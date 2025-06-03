@@ -7,13 +7,17 @@ module.exports = {
   },
 
   Mutation: {
-    createOrder: async (_, { userId, product, amount }) => {
-      // Create the order first
+    createOrder: async (_, { product, amount }, { req }) => {
+      const userId = req.headers["x-user-id"];
+      const userEmail = req.headers["x-user-email"];
+      if (!userId || !userEmail) {
+        throw new Error("Unauthorized: Missing user information");
+      }
+
       const order = await Order.create({ userId, product, amount });
 
       try {
-        const user = await getUserData(userId); // 🔁 call user service via RabbitMQ
-
+        const user = await getUserData(userId);
         const channel = getChannel();
 
         const emailPayload = {
@@ -41,3 +45,16 @@ module.exports = {
     },
   },
 };
+
+function verifyToken(token) {
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error("JWT secret is not defined");
+  }
+
+  try {
+    return jwt.verify(token, secret);
+  } catch (err) {
+    throw new Error("Invalid token");
+  }
+}

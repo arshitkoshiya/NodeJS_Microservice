@@ -7,9 +7,8 @@ const mongoose = require("mongoose");
 const typeDefs = require("./graphql/schema");
 const resolvers = require("./graphql/resolvers");
 const { connectRabbitMQ } = require("./rabbitmq/connection");
-const { buildSubgraphSchema } = require('@apollo/subgraph');
-require('dotenv').config();
-
+const { buildSubgraphSchema } = require("@apollo/subgraph");
+require("dotenv").config();
 
 const startServer = async () => {
   try {
@@ -27,6 +26,9 @@ const startServer = async () => {
   const app = express();
   const server = new ApolloServer({
     schema: buildSubgraphSchema({ typeDefs, resolvers }),
+    context: ({ req }) => {
+      return { req };
+    },
   });
 
   await server.start();

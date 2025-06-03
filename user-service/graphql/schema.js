@@ -7,11 +7,17 @@ module.exports = gql`
     email: String!
   }
 
+  type AuthPayload {
+    token: String!
+    user: User!
+  }
+
   type Query {
     users: [User]
   }
 
   type Mutation {
     createUser(name: String!, email: String!): User
+    login(email: String!): AuthPayload
   }
 `;
