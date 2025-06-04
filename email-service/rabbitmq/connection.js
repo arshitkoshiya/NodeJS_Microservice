@@ -1,5 +1,5 @@
 
-// ✅ email-service/rabbitmq/connection.js
+//  email-service/rabbitmq/connection.js
 const amqp = require("amqplib");
 let channel;
 

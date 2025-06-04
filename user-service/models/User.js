@@ -10,7 +10,7 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
-  orders: [String] // ✅ If needed
+  orders: [String] //  If needed
 });
 
 module.exports = mongoose.model('User', userSchema);

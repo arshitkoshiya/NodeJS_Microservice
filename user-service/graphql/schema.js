@@ -1,7 +1,8 @@
+// schema.js
 const { gql } = require('apollo-server-express');
 
 module.exports = gql`
-  type User {
+  type User @key(fields: "id") {
     id: ID!
     name: String!
     email: String!
@@ -12,8 +13,9 @@ module.exports = gql`
     user: User!
   }
 
-  type Query {
+  extend type Query {
     users: [User]
+    user(id: ID!): User
   }
 
   type Mutation {

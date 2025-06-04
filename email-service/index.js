@@ -1,4 +1,4 @@
-// ✅ email-service/index.js
+//  email-service/index.js
 require("dotenv").config();
 const nodemailer = require("nodemailer");
 const hbs = require("nodemailer-express-handlebars").default;

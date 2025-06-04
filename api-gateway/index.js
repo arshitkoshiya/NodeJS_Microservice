@@ -1,14 +1,18 @@
 require("dotenv").config();
 const express = require("express");
 const { ApolloServer } = require("apollo-server-express");
-const { ApolloGateway, RemoteGraphQLDataSource } = require("@apollo/gateway");
+const {
+  ApolloGateway,
+  RemoteGraphQLDataSource,
+  IntrospectAndCompose,
+} = require("@apollo/gateway");
 const jwt = require("jsonwebtoken");
 const rateLimit = require("express-rate-limit"); // ✅ Added
 
 // ✅ Custom rate limiter middleware
 const rateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 min
-  max: 10, // Limit each IP
+  max: 100, // Limit each IP
   message: {
     success: false,
     message: "Too many requests from this IP, please try again later.",
@@ -27,18 +31,20 @@ class AuthenticatedDataSource extends RemoteGraphQLDataSource {
   }
 }
 
-// ✅ Apollo Gateway setup
+//  Apollo Gateway setup
 const gateway = new ApolloGateway({
-  serviceList: [
-    { name: "user", url: "http://localhost:4000/graphql" },
-    { name: "order", url: "http://localhost:5000/graphql" },
-  ],
+  supergraphSdl: new IntrospectAndCompose({
+    subgraphs: [
+      { name: "user", url: "http://localhost:4000/graphql" },
+      { name: "order", url: "http://localhost:5000/graphql" },
+    ],
+  }),
   buildService({ name, url }) {
     return new AuthenticatedDataSource({ url });
   },
 });
 
-// ✅ Token verifier
+//  Token verifier
 function getUserFromToken(req) {
   const authHeader = req.headers.authorization || "";
   const token = authHeader.split(" ")[1];
@@ -51,22 +57,35 @@ function getUserFromToken(req) {
   }
 }
 
-// ✅ Start server with rate limiter and context
+//  Start server with rate limiter and context
 async function startServer() {
   const app = express();
 
-  app.use(rateLimiter); // ✅ Apply rate limiter
-
+  app.use(rateLimiter);
   const server = new ApolloServer({
     gateway,
     subscriptions: false,
+    // context: ({ req, res }) => { =-=-=-=-=---=----=-=-=-=-=-=-=-=-=-=-=-=-=-=- PRIOVIDE INTROSPECTION ERROR USING THIS CONTEXT COCDE =-=-=--=-=-=-=--=-=-=-=-=-=-=-=-=-
+    //   const user = getUserFromToken(req);
+    //   if (!user) throw new UnauthorizedError("Token missing or invalid");
+    //   return { user, req, res };
+    // },
+
     context: ({ req, res }) => {
+      const isIntrospection = req.body?.operationName === "IntrospectionQuery"; //=-==-=-=-=-=-=-=-=-  SOLVING THIS ISSUE BY CHECKING FOR INTROSPECTION QUERY =-=-=-=-=--=-=-=-=--=-=-=-=-=-=-=-=-
       const user = getUserFromToken(req);
-      console.log("user", user);
+      if (!isIntrospection && !user) {
+        throw new UnauthorizedError("Token missing or invalid");
+      }
       return { user, req, res };
     },
-  });
 
+    formatError: (err) => ({
+      success: false,
+      message: err.message,
+      code: err.extensions?.code || "INTERNAL_SERVER_ERROR",
+    }),
+  });
   await server.start();
   server.applyMiddleware({ app });
 

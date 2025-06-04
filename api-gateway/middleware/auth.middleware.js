@@ -1,24 +1,48 @@
-const jwt = require('jsonwebtoken');
-const secret = process.env.JWT_SECRET; 
+// const jwt = require('jsonwebtoken');
+// const secret = process.env.JWT_SECRET; 
+
+// module.exports = (req, res, next) => {
+//   const auth = req.headers.authorization || '';
+//   const token = auth.startsWith('Bearer ') ? auth.split(' ')[1] : null;
+
+//   if (!token) {
+//     return next();
+//   }
+
+//   try {
+//     const decoded = verifyToken(token);
+//     req.user = decoded; 
+//   } catch (e) {
+//     console.warn('JWT verification failed:', e.message);
+//   }
+
+//   next();
+// };
+
+// function verifyToken(token) {
+//   return jwt.verify(token, secret);
+// }
+
+
+const jwt = require("jsonwebtoken");
+const { UnauthorizedError } = require("../utils/errors");
+
+const secret = process.env.JWT_SECRET;
 
 module.exports = (req, res, next) => {
-  const auth = req.headers.authorization || '';
-  const token = auth.startsWith('Bearer ') ? auth.split(' ')[1] : null;
+  const auth = req.headers.authorization || "";
+  const token = auth.startsWith("Bearer ") ? auth.split(" ")[1] : null;
 
   if (!token) {
-    return next();
+    throw new UnauthorizedError("Token missing. Access denied.");
   }
 
   try {
-    const decoded = verifyToken(token);
+    const decoded = jwt.verify(token, secret);
     req.user = decoded; 
-  } catch (e) {
-    console.warn('JWT verification failed:', e.message);
+    next();
+  } catch (err) {
+    console.warn("JWT verification failed:", err.message);
+    throw new UnauthorizedError("Invalid or expired token.");
   }
-
-  next();
 };
-
-function verifyToken(token) {
-  return jwt.verify(token, secret);
-}

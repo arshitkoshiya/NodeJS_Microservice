@@ -2,6 +2,9 @@ const Order = require("../models/Order");
 const { getChannel, getUserData } = require("../rabbitmq/connection");
 
 module.exports = {
+  User: {
+    orders: async (user) => await Order.find({ userId: user.id }),
+  },
   Query: {
     orders: async () => await Order.find(),
   },
@@ -12,6 +15,10 @@ module.exports = {
       const userEmail = req.headers["x-user-email"];
       if (!userId || !userEmail) {
         throw new Error("Unauthorized: Missing user information");
+      }
+
+      if (amount <= 0) {
+        throw new ValidationError("Amount must be greater than zero");
       }
 
       const order = await Order.create({ userId, product, amount });
@@ -45,16 +52,3 @@ module.exports = {
     },
   },
 };
-
-function verifyToken(token) {
-  const secret = process.env.JWT_SECRET;
-  if (!secret) {
-    throw new Error("JWT secret is not defined");
-  }
-
-  try {
-    return jwt.verify(token, secret);
-  } catch (err) {
-    throw new Error("Invalid token");
-  }
-}

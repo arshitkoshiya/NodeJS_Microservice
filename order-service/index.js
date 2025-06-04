@@ -12,20 +12,18 @@ require("dotenv").config();
 
 const startServer = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect(process.env.MONGODB_URI);
     console.log("MongoDB connected");
   } catch (err) {
     console.error("MongoDB connection failed:", err.message);
   }
 
-  await connectRabbitMQ(); // ✅ Ensure RabbitMQ is ready
+  await connectRabbitMQ(); //  Ensure RabbitMQ is ready
 
   const app = express();
   const server = new ApolloServer({
     schema: buildSubgraphSchema({ typeDefs, resolvers }),
+
     context: ({ req }) => {
       return { req };
     },

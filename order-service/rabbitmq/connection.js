@@ -1,4 +1,4 @@
-// ✅ order-service/rabbitmq.js
+//  order-service/rabbitmq.js
 const amqp = require("amqplib");
 const { v4: uuidv4 } = require("uuid");
 
